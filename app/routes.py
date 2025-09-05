@@ -7,17 +7,36 @@ from .modals import User, Tasks
 
 main = Blueprint("main", __name__)
 
-@login_manager._load_user
+@login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 @main.route("/", methods=['GET', 'POST'])
 def login_page():
-    return render_template("login.html")
+        if request.method == "POST":
+            user = User.query.filter_by(user_name=request.form.get("username"))
+            if user and check_password_hash(user.password_hash, request.form['password']):
+                 login_user(user, remember=False)
+                 return redirect(url_for("index"))
+        
+        return render_template("login.html")
 
-@main.route("/create_account")
+@main.route("/register", methods=["GET", "POST"])
 def create_user():
-    return render_template("/create_user.html")
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if not username or not password:
+             flash("Username and password are required!", "error")
+             return render_template("/register")
+        if User.query.filter_by(username=username).first():
+            flash("Username is already taken!", 'error')
+            render_template("/register.html")
+        new_user = User(username=username, password_hash = generate_password_hash(password))
+        db.session.add(new_user)
+        db.session.commit()
+        redirect(url_for("main.index"))
+    return render_template("/register.html")
 
 @main.route("/logout")
 @login_required
@@ -25,3 +44,43 @@ def logout():
     logout_user()
     message = "Thank you for using my ToDo app!"
     return render_template("/login.html", message=message)
+
+@main.route("/index")
+@login_required
+def index():
+    all_tasks = Tasks.query.all()
+    render_template('/index.html', tasks=all_tasks)
+
+@main.route("/create_tasks", methods=["POST"])
+@login_required
+def create_tasks():
+     if request.method == "POST":
+        title = request.form.get("title")
+        content = request.form.get("content")
+        priority = request.form.get("priority")
+        tag = request.form.get("tag")
+        due_date = request.form.get("due_date")
+        new_task = Tasks(title=title, content=content, priority=priority, tag=tag, due_date=due_date)
+        db.session.add(new_task)
+        db.session.commit()
+        return render_template("index.html")
+     render_template("/create_task")
+
+@main.route("/delete_task", methods=["POST"])
+@login_required
+def delete_task():
+    task_id = request.form.get("id")
+    task = Tasks.query.get(task_id)
+
+    if task and task.user_id == current_user.id: 
+        db.session.delete(task)
+        db.session.commit()
+        flash("Task deleted successfully")
+    else:
+        flash("Task not found or not authorized")
+
+    return redirect(url_for("main.index"))
+
+@main.route("/edit_tasks", methods=["POST"])
+def edit_task():
+    return render_template("/edit_task")
