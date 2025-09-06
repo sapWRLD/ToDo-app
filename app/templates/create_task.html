@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Create Task</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <form action="/create_task" method="POST">
+        <!-- Title -->
+        <div class="input-group mb-3">
+            <span class="input-group-text">Title</span>
+            <input type="text" class="form-control" name="title" placeholder="Title" required>
+        </div>
+
+        <!-- Priority -->
+        <div class="mb-3">
+            <label for="priority" class="form-label">Priority</label>
+            <select class="form-select" id="priority" name="priority" required>
+                <option value="" disabled selected>Select priority</option>
+                <option value="1">Urgent</option>
+                <option value="2">High</option>
+                <option value="3">Medium</option>
+                <option value="4">Low</option>
+                <option value="5">Non important</option>
+            </select>
+        </div>
+
+        <!-- Content -->
+        <div class="input-group mb-3">
+            <span class="input-group-text">Content</span>
+            <textarea class="form-control" name="content" placeholder="Task details..." required></textarea>
+        </div>
+
+        <!-- Due Date -->
+        <div class="mb-3">
+            <label for="due_date" class="form-label">Due Date</label>
+            <input type="date" class="form-control" id="due_date" name="due_date">
+        </div>
+
+        <!-- Tags -->
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags</label>
+            <select class="form-select" id="tags" name="tags" multiple>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="urgent">Urgent</option>
+                <option value="meeting">Meeting</option>
+                <option value="shopping">Shopping</option>
+                <option value="other">Other</option>
+            </select>
+            <small class="text-muted">Hold down Ctrl (Windows) or Command (Mac) to select multiple tags.</small>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary">Create Task</button>
+    </form>
+</div>
+{% endblock %}

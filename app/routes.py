@@ -4,6 +4,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, login_manager
 from .modals import User, Tasks
+from datetime import datetime
 
 main = Blueprint("main", __name__)
 
@@ -51,16 +52,25 @@ def index():
     all_tasks = Tasks.query.all()
     render_template('/index.html', tasks=all_tasks)
 
-@main.route("/create_tasks", methods=["POST"])
+@main.route("/create_task", methods=["GET", "POST"])
 @login_required
 def create_tasks():
      if request.method == "POST":
         title = request.form.get("title")
         content = request.form.get("content")
-        priority = request.form.get("priority")
-        tag = request.form.get("tag")
-        due_date = request.form.get("due_date")
-        new_task = Tasks(title=title, content=content, priority=priority, tag=tag, due_date=due_date)
+        priority = int(request.form.get("priority"))
+        tags_list = request.form.getlist("tag")
+        due_datestr = request.form["due_date"]
+        due_date = datetime.strftime(due_datestr, "%Y-%m-%d") if due_datestr else None
+
+        new_task = Tasks(
+        title=title,
+        content=content,
+        priority=priority,
+        due_date=due_date,
+        tag=tags_list,  # store JSON array
+        user_id=current_user.id
+    )
         db.session.add(new_task)
         db.session.commit()
         return render_template("index.html")
