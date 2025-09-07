@@ -7,20 +7,21 @@
 {%block body%}
     <div class="card" style="width: 18rem;">
     <div class="card-body">
-        <form action="/login", method="POST"> 
-        <h1 class="card-title">Welcome</h1>
-            <label for="username" class="form-label">Username</label>
-            <input type="text" id="username" class="form-control" aria-describedby="UsernameHelpBlock">
-            <div id="UsernameHelpBlock" class="error-message">
-                Your username must be 2 characters long.
-            </div>
-            <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" class="form-control" aria-describedby="passwordHelpBlock">
-            <div id="passwordHelpBlock" class="error-message">
-                Your password must be 8-20 characters long.
-            </div>
-            <button class="btn btn-primary" type="submit">Login!</button>
-            <a class="btn btn-primary" href=" {{ url_for("main.create_user")}}" role="button">Register</a>
+        <form action="/", method="POST"> 
+            <h1 class="card-title">Welcome</h1>
+                <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" id="username" class="form-control" aria-describedby="UsernameHelpBlock">
+                <div id="UsernameHelpBlock" class="error-message">
+                    Your username must be 2 characters long.
+                </div>
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" aria-describedby="passwordHelpBlock">
+                <div id="passwordHelpBlock" class="error-message">
+                    Your password must be 8-20 characters long.
+                </div>
+                <button class="btn btn-primary" type="submit">Login!</button>
+                <a class="btn btn-primary" href=" {{ url_for("main.create_user")}}" role="button">Register</a>
+            </form>
     </div>
     </div>
     <script src="{{ url_for('static', filename='js/validcheck.js') }}"></script>

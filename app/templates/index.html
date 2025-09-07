@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Home Page</title>
+{% endblock %}
+
+{%block body%}
+<a class="btn btn-primary" href=" {{ url_for("main.create_tasks")}}" role="button">Create!</a>
+
+
+<table class="table">
+  {% for task in tasks%}
+  <thead>
+        <tr>
+        <th scope="col">Title</th>
+        <th scope="col">Content</th>
+        <th scope="col">Tag</th>
+        <th scope="col">Created On</th>
+        <th scope:"col">Due by</th>
+        <th scope="col">Priority</th>
+        <th scope="col">Progress</th>
+        <th scope="col"></th>
+        </tr>
+    </thead>
+  <tbody>
+    <tr>
+      <td>{{task.title}}</td>
+      <td>{{task.content}}</td>
+      <td>{{ task.tag|from_json|join(", ") }}</td>
+      <td>{{task.create_date}}</td>
+      <td>{{task.due_date}}</td>
+      <td class="priority">{{task.priority}}</td>
+      <td>{{task.status.value}}</td>
+      <td>
+        <form action="/create_task" method="POST">
+        <a class="btn btn-primary" href=" {{ url_for("main.edit_task")}}" role="button">Edit!</a>
+        </form>
+        <form action="/delete_task" methods="POST">
+        <a class="btn btn-primary" href=" {{ url_for("main.delete_task")}}" role="button">Delete!</a>
+        </form>
+    </td>
+    </tr>
+  </tbody>
+  {% endfor %}
+</table>
+    <script src="{{ url_for('static', filename='js/priority_check.js') }}"></script>
+{% endblock %}

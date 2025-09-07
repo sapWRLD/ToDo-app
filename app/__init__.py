@@ -2,6 +2,7 @@ from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_manager
+import json
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -20,5 +21,12 @@ def create_app():
 
     from .routes import main
     app.register_blueprint(main)
+
+    @app.template_filter("from_json")
+    def from_json_filter(value):
+        try:
+            return json.loads(value) if value else []
+        except Exception:
+            return []
 
     return app

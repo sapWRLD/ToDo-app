@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, login_manager
 from .modals import User, Tasks
 from datetime import datetime
+import json
 
 main = Blueprint("main", __name__)
 
@@ -14,13 +15,14 @@ def load_user(user_id):
 
 @main.route("/", methods=['GET', 'POST'])
 def login_page():
-        if request.method == "POST":
-            user = User.query.filter_by(user_name=request.form.get("username"))
-            if user and check_password_hash(user.password_hash, request.form['password']):
-                 login_user(user, remember=False)
-                 return redirect(url_for("index"))
-        
+    if request.method == "POST":
+        user = User.query.filter_by(username=request.form.get("username")).first()
+        if user and check_password_hash(user.password_hash, request.form['password']):
+            login_user(user, remember=False)
+            return redirect(url_for("main.index"))
+        flash("Invalid username or password", "error")
         return render_template("login.html")
+    return render_template("login.html")
 
 @main.route("/register", methods=["GET", "POST"])
 def create_user():
@@ -29,54 +31,59 @@ def create_user():
         password = request.form.get("password")
         if not username or not password:
              flash("Username and password are required!", "error")
-             return render_template("/register")
+             return render_template("/register.html")
         if User.query.filter_by(username=username).first():
             flash("Username is already taken!", 'error')
-            render_template("/register.html")
+            return render_template("register.html")
         new_user = User(username=username, password_hash = generate_password_hash(password))
         db.session.add(new_user)
         db.session.commit()
-        redirect(url_for("main.index"))
-    return render_template("/register.html")
+        return redirect(url_for("main.login_page"))
+    return render_template("register.html")
 
 @main.route("/logout")
 @login_required
 def logout():
     logout_user()
-    message = "Thank you for using my ToDo app!"
-    return render_template("/login.html", message=message)
+    flash("Thank you for using my ToDo app!")
+    return render_template("login.html")
 
 @main.route("/index")
 @login_required
 def index():
     all_tasks = Tasks.query.all()
-    render_template('/index.html', tasks=all_tasks)
+    return render_template('index.html', tasks=all_tasks)
+
+from datetime import datetime
 
 @main.route("/create_task", methods=["GET", "POST"])
 @login_required
 def create_tasks():
-     if request.method == "POST":
+    if request.method == "POST":
         title = request.form.get("title")
         content = request.form.get("content")
         priority = int(request.form.get("priority"))
-        tags_list = request.form.getlist("tag")
-        due_datestr = request.form["due_date"]
-        due_date = datetime.strftime(due_datestr, "%Y-%m-%d") if due_datestr else None
+        due_datestr = request.form.get("due_date")
+        due_date = datetime.strptime(due_datestr, "%Y-%m-%d") if due_datestr else None
+        tags = request.form.getlist("tags")
+        tags_json = json.dumps(tags)
 
         new_task = Tasks(
-        title=title,
-        content=content,
-        priority=priority,
-        due_date=due_date,
-        tag=tags_list,  # store JSON array
-        user_id=current_user.id
-    )
+            title=title,
+            content=content,
+            priority=priority,
+            due_date=due_date,
+            tag=tags_json,
+            user_id=current_user.id
+        )
         db.session.add(new_task)
         db.session.commit()
-        return render_template("index.html")
-     render_template("/create_task")
+        return redirect(url_for("main.index"))
 
-@main.route("/delete_task", methods=["POST"])
+    return render_template("create_task.html")
+
+
+@main.route("/delete_task", methods=["GET","POST"])
 @login_required
 def delete_task():
     task_id = request.form.get("id")
@@ -88,9 +95,9 @@ def delete_task():
         flash("Task deleted successfully")
     else:
         flash("Task not found or not authorized")
-
     return redirect(url_for("main.index"))
 
 @main.route("/edit_tasks", methods=["POST"])
 def edit_task():
     return render_template("/edit_task")
+

@@ -21,7 +21,7 @@ class Tasks(db.Model):
     priority = db.Column(db.Integer, nullable=False) 
     status = db.Column(Enum(TaskStatus), nullable=False, default=TaskStatus.pending)
     completed = db.Column(db.Boolean, default=False)
-    tag = db.Column(db.JSON)
+    tag = db.Column(db.String(200))
     create_date = db.Column(db.DateTime, server_default=db.func.now())
     due_date = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
