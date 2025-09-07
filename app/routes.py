@@ -116,7 +116,7 @@ def edit_task():
     task.content = request.form.get("content")
     task.priority = int(request.form.get("priority"))
     due_date = request.form.get("due_date")
-    task.due_date = datetime.strptime(due_date, "%d-%m-%Y") if due_date else None
+    task.due_date = datetime.strptime(due_date, "%y-%m-%d") if due_date else None
     tags = request.form.getlist("tags[]")
     task.tag = json.dumps(tags)
 
