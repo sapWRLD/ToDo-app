@@ -48,11 +48,20 @@ def logout():
     flash("Thank you for using my ToDo app!")
     return render_template("login.html")
 
+from collections import defaultdict
+
 @main.route("/index")
 @login_required
 def index():
-    all_tasks = Tasks.query.all()
-    return render_template('index.html', tasks=all_tasks)
+    all_tasks = Tasks.query.order_by(Tasks.priority).all()
+
+    # Group tasks by priority
+    tasks_by_priority = defaultdict(list)
+    for task in all_tasks:
+        tasks_by_priority[task.priority].append(task)
+
+    return render_template("index.html", tasks_by_priority=tasks_by_priority)
+
 
 @main.route("/create_task", methods=["GET", "POST"])
 @login_required
@@ -113,4 +122,28 @@ def edit_task():
 
     db.session.commit()
     flash("Task updated successfully!", "success")
+    return redirect(url_for("main.index"))
+
+@main.route("/start_task/<int:task_id>", methods=["POST"])
+@login_required
+def start_task(task_id):
+    task = Tasks.query.get(task_id)
+    if not task or task.user_id != current_user.id:
+        flash("Task not found or not autherized!", "error")
+        return redirect(url_for("main.index"))
+    task.status = task.status.__class__.in_progress
+    db.session.commit()
+    flash(f"Task {task.title}' started!", "succes")
+    return redirect(url_for("main.index"))
+
+@main.route("/done_task/<int:task_id>", methods=["POST"])
+@login_required
+def done_task(task_id):
+    task = Tasks.query.get(task_id)
+    if not task or task.user_id != current_user.id:
+        flash("Task not found or not autherized!", "error")
+        return redirect(url_for("main.index"))
+    task.status = task.status.__class__.completed
+    db.session.commit()
+    flash(f"Task {task.title}' started!", "succes")
     return redirect(url_for("main.index"))

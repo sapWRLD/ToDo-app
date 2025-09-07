@@ -5,55 +5,70 @@
 {% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <form action="/create_task" method="POST">
-        <!-- Title -->
-        <div class="input-group mb-3">
-            <span class="input-group-text">Title</span>
-            <input type="text" class="form-control" name="title" placeholder="Title" required>
-        </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create New Task</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('main.create_tasks') }}" method="POST" autocomplete="off">
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-semibold">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Task title" required>
+                        </div>
 
-        <!-- Priority -->
-        <div class="mb-3">
-            <label for="priority" class="form-label">Priority</label>
-            <select class="form-select" id="priority" name="priority" required>
-                <option value="" disabled selected>Select priority</option>
-                <option value="1">Urgent</option>
-                <option value="2">High</option>
-                <option value="3">Medium</option>
-                <option value="4">Low</option>
-                <option value="5">Non important</option>
-            </select>
-        </div>
+                        <!-- Priority -->
+                        <div class="mb-3">
+                            <label for="priority" class="form-label fw-semibold">Priority</label>
+                            <select class="form-select" id="priority" name="priority" required>
+                                <option value="" disabled selected>Select priority</option>
+                                <option value="1">Urgent</option>
+                                <option value="2">High</option>
+                                <option value="3">Medium</option>
+                                <option value="4">Low</option>
+                                <option value="5">Non important</option>
+                            </select>
+                        </div>
 
-        <!-- Content -->
-        <div class="input-group mb-3">
-            <span class="input-group-text">Content</span>
-            <textarea class="form-control" name="content" placeholder="Task details..." required></textarea>
-        </div>
+                        <!-- Content -->
+                        <div class="mb-3">
+                            <label for="content" class="form-label fw-semibold">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="3" placeholder="Task details..." required></textarea>
+                        </div>
 
-        <!-- Due Date -->
-        <div class="mb-3">
-            <label for="due_date" class="form-label">Due Date</label>
-            <input type="date" class="form-control" id="due_date" name="due_date">
-        </div>
+                        <!-- Due Date -->
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label fw-semibold">Due Date</label>
+                            <input type="date" class="form-control" id="due_date" name="due_date">
+                        </div>
 
-        <!-- Tags -->
-        <div class="mb-3">
-            <label for="tags" class="form-label">Tags</label>
-            <select class="form-select" id="tags" name="tags" multiple>
-                <option value="work">Work</option>
-                <option value="personal">Personal</option>
-                <option value="urgent">Urgent</option>
-                <option value="meeting">Meeting</option>
-                <option value="shopping">Shopping</option>
-                <option value="other">Other</option>
-            </select>
-            <small class="text-muted">Hold down Ctrl (Windows) or Command (Mac) to select multiple tags.</small>
-        </div>
+                        <!-- Tags -->
+                        <div class="mb-4">
+                            <label for="tags" class="form-label fw-semibold">Tags</label>
+                            <select class="form-select" id="tags" name="tags" multiple>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="meeting">Meeting</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="form-text">Hold Ctrl (Windows) or Command (Mac) to select multiple tags.</div>
+                        </div>
 
-        <!-- Submit -->
-        <button type="submit" class="btn btn-primary">Create Task</button>
-    </form>
+                        <!-- Submit -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check2-circle me-1"></i>Create Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

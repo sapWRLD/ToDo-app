@@ -2,12 +2,11 @@
   border-color: red !important;
 }
 
-.error-message {
-  display: none;
-  color: red;
-  font-size: 14px;
+.error-border {
+  border-color: red !important;
 }
 
-.error-message.active {
+.form-text.active {
+  color: red;
   display: block;
 }/*# sourceMappingURL=styles.css.map */
