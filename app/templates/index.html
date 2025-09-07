@@ -4,44 +4,55 @@
 <title>Home Page</title>
 {% endblock %}
 
-{%block body%}
-<a class="btn btn-primary" href=" {{ url_for("main.create_tasks")}}" role="button">Create!</a>
+{% block body %}
+<a class="btn btn-primary mb-3" href="{{ url_for('main.create_tasks') }}">Create!</a>
 
-
-<table class="table">
-  {% for task in tasks%}
+<table class="table table-striped">
   <thead>
-        <tr>
-        <th scope="col">Title</th>
-        <th scope="col">Content</th>
-        <th scope="col">Tag</th>
-        <th scope="col">Created On</th>
-        <th scope:"col">Due by</th>
-        <th scope="col">Priority</th>
-        <th scope="col">Progress</th>
-        <th scope="col"></th>
-        </tr>
-    </thead>
-  <tbody>
     <tr>
-      <td>{{task.title}}</td>
-      <td>{{task.content}}</td>
-      <td>{{ task.tag|from_json|join(", ") }}</td>
-      <td>{{task.create_date}}</td>
-      <td>{{task.due_date}}</td>
-      <td class="priority">{{task.priority}}</td>
-      <td>{{task.status.value}}</td>
-      <td>
-        <form action="/create_task" method="POST">
-        <a class="btn btn-primary" href=" {{ url_for("main.edit_task")}}" role="button">Edit!</a>
-        </form>
-        <form action="/delete_task" methods="POST">
-        <a class="btn btn-primary" href=" {{ url_for("main.delete_task")}}" role="button">Delete!</a>
-        </form>
-    </td>
+      <th>Title</th>
+      <th>Content</th>
+      <th>Tags</th>
+      <th>Created On</th>
+      <th>Due by</th>
+      <th>Priority</th>
+      <th>Status</th>
+      <th>Actions</th>
     </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr>
+      <td>{{ task.title }}</td>
+      <td>{{ task.content }}</td>
+      <td>{{ task.tag|from_json|join(", ") }}</td>
+      <td>{{ task.create_date }}</td>
+      <td>{{ task.due_date }}</td>
+      <td>{{ task.priority }}</td>
+      <td>{{ task.status.value }}</td>
+      <td>
+        <button class="edit-task-btn btn btn-warning"
+            data-id="{{ task.id }}"
+            data-title="{{ task.title }}"
+            data-content="{{ task.content }}"
+            data-priority="{{ task.priority }}"
+            data-tag="{{ task.tag|from_json|join(',') }}"
+            data-due_date="{{ task.due_date }}">
+            Edit
+        </button>
+
+        <form action="{{ url_for('main.delete_task') }}" method="POST" style="display:inline;">
+          <input type="hidden" name="id" value="{{ task.id }}">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
   </tbody>
-  {% endfor %}
 </table>
-    <script src="{{ url_for('static', filename='js/priority_check.js') }}"></script>
+
+{% include "modals.html" %}
+<script src="{{ url_for('static', filename='js/edit_task.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modals.js') }}"></script>
+<script src="{{ url_for('static', filename='js/priority_check.js') }}"></script>
 {% endblock %}

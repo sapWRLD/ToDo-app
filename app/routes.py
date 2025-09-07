@@ -54,8 +54,6 @@ def index():
     all_tasks = Tasks.query.all()
     return render_template('index.html', tasks=all_tasks)
 
-from datetime import datetime
-
 @main.route("/create_task", methods=["GET", "POST"])
 @login_required
 def create_tasks():
@@ -83,13 +81,12 @@ def create_tasks():
     return render_template("create_task.html")
 
 
-@main.route("/delete_task", methods=["GET","POST"])
+@main.route("/delete_task", methods=["POST"])
 @login_required
 def delete_task():
     task_id = request.form.get("id")
     task = Tasks.query.get(task_id)
-
-    if task and task.user_id == current_user.id: 
+    if task and task.user_id == current_user.id:
         db.session.delete(task)
         db.session.commit()
         flash("Task deleted successfully")
@@ -97,7 +94,23 @@ def delete_task():
         flash("Task not found or not authorized")
     return redirect(url_for("main.index"))
 
-@main.route("/edit_tasks", methods=["POST"])
+@main.route("/edit_task", methods=["POST"])
+@login_required
 def edit_task():
-    return render_template("/edit_task")
+    task_id = request.form.get("task_id")
+    task = Tasks.query.get(task_id)
+    if not task or task.user_id != current_user.id:
+        flash("Task not found or not authorized!", "error")
+        return redirect(url_for("main.index"))
 
+    task.title = request.form.get("title")
+    task.content = request.form.get("content")
+    task.priority = int(request.form.get("priority"))
+    due_date = request.form.get("due_date")
+    task.due_date = datetime.strptime(due_date, "%d-%m-%Y") if due_date else None
+    tags = request.form.getlist("tags[]")
+    task.tag = json.dumps(tags)
+
+    db.session.commit()
+    flash("Task updated successfully!", "success")
+    return redirect(url_for("main.index"))
